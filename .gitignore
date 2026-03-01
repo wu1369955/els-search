@@ -1,0 +1,51 @@
+# 操作系统文件
+Thumbs.db
+.DS_Store
+
+# 编辑器文件
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 编译产物
+backend/main
+backend/main.exe
+backend/*.exe
+backend/*.dll
+backend/*.so
+backend/*.dylib
+
+# 依赖目录
+backend/vendor/
+
+# 环境变量文件
+.env
+.env.local
+.env.*.local
+
+# 日志文件
+*.log
+logs/
+
+# 测试文件
+coverage.out
+
+# 临时文件
+tmp/
+temp/
+
+# 数据文件
+*.jsonl
+*.csv
+*.xlsx
+
+# IDE 配置文件
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
