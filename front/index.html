@@ -440,6 +440,119 @@
     </div>
 
     <script>
+        // 性能监控
+        function initPerformanceMonitoring() {
+            // 监听页面加载完成事件
+            window.addEventListener('load', function() {
+                // 收集性能数据
+                const performanceData = collectPerformanceData();
+                // 发送性能数据到后端
+                sendPerformanceData(performanceData);
+            });
+
+            // 监听用户交互事件
+            document.addEventListener('click', function(e) {
+                if (e.target.id === 'search-button' || e.target.closest('#search-form')) {
+                    const startTime = performance.now();
+                    // 监听搜索请求完成
+                    const originalFetch = window.fetch;
+                    window.fetch = function(...args) {
+                        return originalFetch.apply(this, args).then(response => {
+                            if (args[0].includes('/api/search')) {
+                                const endTime = performance.now();
+                                const searchPerformance = {
+                                    type: 'search',
+                                    duration: endTime - startTime,
+                                    timestamp: new Date().toISOString()
+                                };
+                                sendPerformanceData(searchPerformance);
+                            }
+                            return response;
+                        });
+                    };
+                }
+            });
+        }
+
+        // 收集性能数据
+        function collectPerformanceData() {
+            const navigationEntry = performance.getEntriesByType('navigation')[0];
+            if (!navigationEntry) return null;
+
+            return {
+                type: 'page_load',
+                timestamp: new Date().toISOString(),
+                metrics: {
+                    dnsLookup: navigationEntry.domainLookupEnd - navigationEntry.domainLookupStart,
+                    tcpConnection: navigationEntry.connectEnd - navigationEntry.connectStart,
+                    tlsHandshake: navigationEntry.secureConnectionStart ? (navigationEntry.connectEnd - navigationEntry.secureConnectionStart) : 0,
+                    serverResponse: navigationEntry.responseEnd - navigationEntry.requestStart,
+                    domContentLoaded: navigationEntry.domContentLoadedEventEnd - navigationEntry.startTime,
+                    pageLoad: navigationEntry.loadEventEnd - navigationEntry.startTime
+                }
+            };
+        }
+
+        // 发送性能数据到后端
+        function sendPerformanceData(data) {
+            if (!data) return;
+
+            fetch('http://localhost:8080/api/analytics/performance', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            }).catch(error => {
+                console.log('Performance data sending failed:', error);
+                reportError(error, 'performance_data_sending');
+            });
+        }
+
+        // 错误监控
+        function initErrorMonitoring() {
+            // 监听全局错误
+            window.addEventListener('error', function(e) {
+                reportError(e.error, 'global_error', {
+                    filename: e.filename,
+                    lineno: e.lineno,
+                    colno: e.colno
+                });
+            });
+
+            // 监听未处理的 Promise  rejection
+            window.addEventListener('unhandledrejection', function(e) {
+                reportError(e.reason, 'promise_rejection');
+            });
+        }
+
+        // 报告错误
+        function reportError(error, errorType, context) {
+            const errorData = {
+                type: errorType,
+                message: error.message || 'Unknown error',
+                stack: error.stack || '',
+                timestamp: new Date().toISOString(),
+                context: context || {}
+            };
+
+            fetch('http://localhost:8080/api/analytics/error', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(errorData)
+            }).catch(err => {
+                console.log('Error reporting failed:', err);
+            });
+        }
+
+        // 初始化性能监控
+        initPerformanceMonitoring();
+
+        // 初始化错误监控
+        initErrorMonitoring();
+
         // 后端 API 基础 URL
         const API_BASE_URL = 'http://localhost:8080';
         
