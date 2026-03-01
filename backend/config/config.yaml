@@ -1,0 +1,5 @@
+server:
+  addr: "localhost:8080"
+
+elasticsearch:
+  host: "http://localhost:9200"
