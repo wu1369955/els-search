@@ -38,7 +38,8 @@ func CreateIndex(ctx context.Context, client *elasticsearch.Client, index string
 
 	// 如果有配置，则添加到请求中
 	if len(config) > 0 {
-		data, err := json.Marshal(config)
+		var data []byte
+		data, err = json.Marshal(config)
 		if err != nil {
 			return fmt.Errorf("failed to marshal config: %w", err)
 		}
