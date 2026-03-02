@@ -127,6 +127,14 @@
 docker-compose up -d
 ```
 
+编译重新启动服务：
+
+
+```bash
+docker-compose down
+docker-compose up --build -d
+```
+
 ### 3. 📤 导入数据
 
 当 Elasticsearch 服务启动后，运行以下命令导入数据：
