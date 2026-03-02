@@ -9,10 +9,10 @@ elasticsearch:
 
 rate_limit:
   global:
-    rps: 100
+    rps: 10000
   search:
-    rps: 50
-    burst: 100
+    rps: 5000
+    burst: 10000
 
 redis:
   addr: "redis:6379"
